@@ -8,6 +8,9 @@ import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
 import com.lambdaworks.redis.api.async.RedisListAsyncCommands;
 import com.lambdaworks.redis.api.sync.RedisCommands;
+import com.lambdaworks.redis.protocol.RedisCommand;
+import redisson.CustomData;
+import redisson.CustomDetail;
 
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
@@ -18,6 +21,7 @@ public class LettuceConnection {
         RedisClient redisClient = new RedisClient(
                 RedisURI.create("redis://localhost/1"));
         StatefulRedisConnection<String, String> connection = redisClient.connect();
+        StatefulRedisConnection<String, Object> connectionSerializable = redisClient.connect(new SerializedObjectCodec());
 
         System.out.println("Connected to Redis");
 
@@ -47,6 +51,10 @@ public class LettuceConnection {
         listAsyncCommands.lpush("events","key02:asd1");
         listAsyncCommands.lpush("events","key03:asd2");
 
-
+        //serializable
+        RedisCommands<String, Object> stringObjectRedisCommands =connectionSerializable.sync();
+//        stringObjectRedisCommands.hset("user:hi", "10", new CustomData(3,"morteza", new CustomDetail(7,9)));
+        CustomData customer = (CustomData) stringObjectRedisCommands.hget("user:hi", "10");
+        System.out.println(customer.getName()+"---"+customer.getDetail().getY());
     }
 }
