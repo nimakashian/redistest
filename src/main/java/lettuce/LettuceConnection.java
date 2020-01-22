@@ -6,6 +6,7 @@ import com.lambdaworks.redis.RedisFuture;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
+import com.lambdaworks.redis.api.async.RedisListAsyncCommands;
 import com.lambdaworks.redis.api.sync.RedisCommands;
 
 import java.util.StringTokenizer;
@@ -21,9 +22,11 @@ public class LettuceConnection {
         System.out.println("Connected to Redis");
 
         RedisCommands<String, String> commands =connection.sync();
-        commands.set("mor0001", "bar0002");
+        commands.set("mor0002", "bar0003");
         String value = commands.get("mor0001");
         System.out.println(value);
+        System.out.println("---------- list ----");
+        System.out.println(commands.mget(new String[]{"mor0001", "mor0002"}));
 //        connection.close();
 //        redisClient.shutdown();
 
@@ -37,6 +40,13 @@ public class LettuceConnection {
 //            }
 //        });
         future.thenAcceptAsync(System.out::println);
+
+
+        RedisListAsyncCommands<String, String> listAsyncCommands=connection.async();
+        listAsyncCommands.lpush("events","key01:asd0");
+        listAsyncCommands.lpush("events","key02:asd1");
+        listAsyncCommands.lpush("events","key03:asd2");
+
 
     }
 }
